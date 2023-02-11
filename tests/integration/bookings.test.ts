@@ -231,8 +231,9 @@ describe("POST /booking", () => {
     const roomId = faker.datatype.number();
     const body = { roomId };
     const enrollment = await createEnrollmentWithAddress(user);
+    const isRemote = false;
     const includesHotel = false;
-    const ticketType = await createTicketType(includesHotel);
+    const ticketType = await createTicketType(includesHotel, isRemote);
     await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
 
     const response = await server.post("/booking")

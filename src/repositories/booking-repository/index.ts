@@ -11,7 +11,7 @@ function findBookingByUserId(userId: number): Prisma.Prisma__BookingClient<{ id:
   });
 }
 
-function makeBooking(userId: number, roomId: number): Prisma.Prisma__BookingClient<Booking> {
+function makeBooking(userId: number, roomId: number): Prisma.Prisma__BookingClient<Booking> {  
   return prisma.booking.create({
     data: {
       userId,
@@ -40,13 +40,18 @@ function findBookingByRoomId(roomId: number): Prisma.Prisma__BookingClient<Booki
   return prisma.booking.findFirst({ where: { roomId } });
 }
 
+function findBookingById(id: number): Prisma.Prisma__BookingClient<Booking> {
+  return prisma.booking.findUnique({ where: { id } });
+}
+
 const bookingRepository = {
   findBookingByUserId,
   makeBooking,
   changeBooking,
   findEnrollmentAndTicketByUserId,
   findRoomById,
-  findBookingByRoomId
+  findBookingByRoomId,
+  findBookingById
 };
 
 export default bookingRepository;

@@ -3,8 +3,6 @@ import bookingRepository from "@/repositories/booking-repository";
 import { Booking, Room, Ticket, TicketType } from "@prisma/client";
 
 async function getBooking(userId: number): Promise<{ id: number; Room: Room; }> {
-  await checkingEnrollmentAndTicket(userId);
-
   const booking: {
     id: number;
     Room: Room;
@@ -17,7 +15,7 @@ async function getBooking(userId: number): Promise<{ id: number; Room: Room; }> 
   return booking;
 }
 
-async function postBooking(userId: number, body: {roomId: number;}): Promise<number> {
+async function postBooking(userId: number, body: {roomId: number;}): Promise<{ bookingId: number; }> {
   await checkingEnrollmentAndTicket(userId);
 
   const room: Room = await bookingRepository.findRoomById(body.roomId);
@@ -32,13 +30,17 @@ async function postBooking(userId: number, body: {roomId: number;}): Promise<num
     throw forbiddenError();
   }
 
-  const { id }: {id: number;} = await bookingRepository.makeBooking(userId, body.roomId);
+  const { id: bookingId }: { id: number; } = await bookingRepository.makeBooking(userId, body.roomId);
 
-  return id;
+  return { bookingId };
 }
 
-async function putBooking(userId: number, bookingId: number, body: {roomId: number;}): Promise<number> {
-  await checkingEnrollmentAndTicket(userId);
+async function putBooking(id: number, body: {roomId: number;}): Promise<{ bookingId: number; }> {
+  const booking: Booking = await bookingRepository.findBookingById(id);
+
+  if (booking === null) {
+    throw forbiddenError();
+  }
 
   const room: Room = await bookingRepository.findRoomById(body.roomId);
 
@@ -52,12 +54,12 @@ async function putBooking(userId: number, bookingId: number, body: {roomId: numb
     throw forbiddenError();
   }
   
-  const { id }: {id: number;} = await bookingRepository.changeBooking(bookingId, body.roomId);
+  const { id: bookingId }: { id: number; } = await bookingRepository.changeBooking(id, body.roomId);
 
-  return id;
+  return { bookingId };
 }
 
-async function checkingEnrollmentAndTicket(userId: number) {
+async function checkingEnrollmentAndTicket(userId: number): Promise<void> {
   const enrollmentAndTicketUser: (Ticket & {
     TicketType: TicketType;
   })[] = await bookingRepository.findEnrollmentAndTicketByUserId(userId);  

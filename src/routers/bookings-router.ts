@@ -9,12 +9,12 @@ bookingsRouter.use(authenticateToken);
 
 bookingsRouter.get("/", getBooking);
 
-bookingsRouter.post("/", validateBody(BookingBodySchema), postBooking);
+bookingsRouter.post("/", validateBody(BookingBodySchema, "FORBIDDEN"), postBooking);
 
 bookingsRouter.put(
   "/:bookingId",
-  validateParams(BookingIdSchema),
-  validateBody(BookingBodySchema),
+  validateParams(BookingIdSchema, "FORBIDDEN"),
+  validateBody(BookingBodySchema, "FORBIDDEN"),
   putBooking
 );
 
